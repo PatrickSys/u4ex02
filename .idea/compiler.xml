@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="HibernateApp" />
+        <module name="HibernateAppEx" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="HibernateApp" target="1.8" />
+      <module name="HibernateAppEx" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,0 +1,19 @@
+package entity;
+
+import javax.persistence.Entity;
+
+/************************************************************************
+ Made by        PatrickSys
+ Date           21/02/2022
+ Package        entity
+ Description:
+ ************************************************************************/
+
+
+public interface CustomEntity<T> extends Entity {
+    void setId(int entityId);
+    String name();
+    CustomEntity<T> createWithJoption(CustomEntity<?> entity);
+}
+
+
