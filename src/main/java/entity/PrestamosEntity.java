@@ -14,7 +14,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "prestamo", schema = "u4ex02", catalog = "")
-public class PrestamosEntity implements CustomEntity {
+public class PrestamosEntity implements CustomEntity<PrestamosEntity> {
 
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
@@ -37,19 +37,19 @@ public class PrestamosEntity implements CustomEntity {
   @Column(name = "fin_prestamo", nullable = false)
   private Date finPrestamo;
 
-  public int getIdPrestamo() {
+  public int getId() {
     return idPrestamo;
   }
 
-  public void setIdPrestamo(int idPrestamo) {
+  public void setId(int idPrestamo) {
     this.idPrestamo = idPrestamo;
   }
 
-  public int getId() {
+  public int getIdLibro() {
     return idLibro;
   }
 
-  public void setId(int idLibro) {
+  public void setIdLibro(int idLibro) {
     this.idLibro = idLibro;
   }
 
@@ -114,7 +114,7 @@ public class PrestamosEntity implements CustomEntity {
   }
 
   @Override
-  public CustomEntity createWithJoption(CustomEntity entity) {
+  public CustomEntity<PrestamosEntity> createWithJoption(CustomEntity<?> entity) {
     return null;
   }
 

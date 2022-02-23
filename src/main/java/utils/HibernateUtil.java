@@ -11,8 +11,12 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+
+import static utils.ManagamentUtils.showEntityNotFoundException;
+import static utils.ManagamentUtils.showSuccessfullyEntityDeleted;
 
 /************************************************************************
  Made by        PatrickSys
@@ -44,28 +48,46 @@ public class HibernateUtil {
 
     }
 
-    public void update(Object object) {
+    public void update(CustomEntity<?> entity) throws EntityNotFoundException {
         this.session = this.sessionFactory.openSession();
         this.session.beginTransaction();
-        this.session.update(object);
-        this.session.flush();
+        this.session.update(entity);
+        try {
+            this.session.flush();
+        }
+        catch (OptimisticLockException e) {
+            this.session.close();
+            throw new EntityNotFoundException(entity.name());
+        }
         this.session.close();
-    }
+        }
 
-    public void delete(Object object) {
+    public void delete(CustomEntity<?> entity) throws EntityNotFoundException {
         this.session = this.sessionFactory.openSession();
         this.session.beginTransaction();
-        this.session.delete(object);
-        this.session.flush();
+        this.session.delete(entity);
+        try {
+            this.session.flush();
+        }
+        catch (OptimisticLockException e) {
+            this.session.close();
+            throw new EntityNotFoundException(entity.name());
+        }
+        showSuccessfullyEntityDeleted(entity.name());
         this.session.close();
     }
 
 
     public CustomEntity<?> getFromDb(int id, CustomEntity<?> entity) {
+        this.session = this.sessionFactory.openSession();
         this.session.beginTransaction();
         CustomEntity<?> retrievedEntity = this.session.get(entity.getClass(), id);
         this.session.flush();
         this.session.close();
+
+        if(null == retrievedEntity) {
+            throw new EntityNotFoundException(entity.name());
+        }
         return retrievedEntity;
     }
 

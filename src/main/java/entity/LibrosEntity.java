@@ -1,5 +1,7 @@
 package entity;
 
+import exception.UserNullinputException;
+
 import java.lang.annotation.Annotation;
 import java.util.Objects;
 import javax.persistence.*;
@@ -130,18 +132,21 @@ public class LibrosEntity implements CustomEntity<LibrosEntity> {
     return "Libro";
   }
 
-  public CustomEntity<LibrosEntity> createWithJoption(LibrosEntity libro) {
+  @Override
+  public CustomEntity<LibrosEntity> createWithJoption(CustomEntity<?> libro) throws UserNullinputException {
+    LibrosEntity newLibro = new LibrosEntity();
+    newLibro.setId(libro.getId());
     String titulo = inputString("titulo del libro: ");
     int numeroEjemplares = inputNumber("numero ejemplares: ");
     String editorial = inputString("editorial: ");
     int numPaginas = inputNumber("numero de páginas: ");
     int anoEdicion = inputNumber("año de edición: ");
-    libro.setTitulo(titulo);
-    libro.setNumEjemplares(numeroEjemplares);
-    libro.setEditorial(editorial);
-    libro.setNumPaginas(numPaginas);
-    libro.setAnoEdicion(anoEdicion);
-    return libro;
+    newLibro.setTitulo(titulo);
+    newLibro.setNumEjemplares(numeroEjemplares);
+    newLibro.setEditorial(editorial);
+    newLibro.setNumPaginas(numPaginas);
+    newLibro.setAnoEdicion(anoEdicion);
+    return newLibro;
   }
 
 }

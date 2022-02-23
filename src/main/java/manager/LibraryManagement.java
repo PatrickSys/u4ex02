@@ -5,8 +5,11 @@ import entity.LibrosEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
 
+import entity.SociosEntity;
+import exception.UserNullinputException;
 import utils.HibernateUtil;
 
 import static utils.ManagamentUtils.*;
@@ -31,7 +34,7 @@ public class LibraryManagement {
   private String menuChoices;
   private ArrayList<String> menuList;
 
-  public void start() {
+  public void start() throws UserNullinputException {
     this.initializeMenuMap();
     this.utils = new HibernateUtil();
 
@@ -39,46 +42,101 @@ public class LibraryManagement {
     this.menuChoices = parseListAsString(this.menuList);
 
     // do things
-    menu();
+    try {
+      menu();
+    } catch (UserNullinputException e) {
+      menu();
+    }
   }
 
-  private void initializeMenuMap() {
+  private void initializeMenuMap() throws UserNullinputException {
     this.menuCallbackMap = new HashMap<>();
-    this.menuCallbackMap.put(1, () -> utils.persist(create(new LibrosEntity())));
+    this.menuCallbackMap.put(1, () -> this.create(new LibrosEntity()));
     this.menuCallbackMap.put(2, () -> this.baja(new LibrosEntity()));
     this.menuCallbackMap.put(3, () -> this.update(new LibrosEntity()));
-  }
-
-  private CustomEntity<?> create(CustomEntity<?> entity) {
-    return entity.createWithJoption(entity);
-  }
-
-
-
-  private void update(CustomEntity<LibrosEntity> entity) {
-    CustomEntity<?> retrievedEntity = getFromDB(entity);
-    this.utils.update(retrievedEntity);
-  }
-
-  private void alta(CustomEntity<?> entity) {
+    this.menuCallbackMap.put(4, () -> this.create(new SociosEntity()));
+    this.menuCallbackMap.put(5, () -> this.baja(new SociosEntity()));
+    this.menuCallbackMap.put(6, () -> this.update(new SociosEntity()));
 
   }
 
-  private void baja(CustomEntity<?> entity) {
-    int entityId = inputNumber("Id del " + entity.name() + " a dar de baja");
+
+  private void create(CustomEntity<?> entity) {
+    try {
+      utils.persist(entity.createWithJoption(entity));
+    }
+    catch (UserNullinputException e) {
+      e.printStackTrace();
+    }
+  }
+
+
+  private void updateLibro(LibrosEntity entity) {
+    try {
+      LibrosEntity retrievedEntity = (LibrosEntity) getFromDB(entity);
+      LibrosEntity newLibro = (LibrosEntity) entity.createWithJoption(retrievedEntity);
+      this.utils.update(newLibro);
+    }
+    catch (UserNullinputException e) {
+      e.printStackTrace();
+    }
+    catch (EntityNotFoundException e ) {
+      showEntityNotFoundException(e.getMessage());
+    }
+  }
+
+  private void update(CustomEntity<?> entity) {
+    try {
+      CustomEntity<?> retrievedEntity = getFromDB(entity);
+      CustomEntity<?> newEntity =  entity.createWithJoption(retrievedEntity);
+      this.utils.update(newEntity);
+    }
+    catch (UserNullinputException e) {
+      e.printStackTrace();
+    }
+    catch (EntityNotFoundException e ) {
+      showEntityNotFoundException(e.getMessage());
+    }
+  }
+
+
+  private void updateSocio(CustomEntity<?> socio) {
+    try {
+      CustomEntity<?> retrievedEntity =  getFromDB(socio);
+      CustomEntity<?> newLibro =  socio.createWithJoption(retrievedEntity);
+      this.utils.update(newLibro);
+    }
+    catch (UserNullinputException e) {
+      e.printStackTrace();
+    }
+    catch (EntityNotFoundException e ) {
+      showEntityNotFoundException(e.getMessage());
+    }
+  }
+
+
+
+  private void baja(CustomEntity<?> entity)  {
+    int entityId = 0;
+    try {
+      entityId = inputNumber("Id del " + entity.name() + " a dar de baja");
+    } catch (UserNullinputException e) {
+      e.printStackTrace();
+      return;
+    }
     entity.setId(entityId);
+
     try {
       this.utils.delete(entity);
     }
-    catch (OptimisticLockException e) {
-      showEntityNotFoundException(entity.name());
-      return;
+    catch (EntityNotFoundException e ) {
+      showEntityNotFoundException(e.getMessage());
     }
-      showSuccessfullyEntityDeleted(entity.name());
+
   }
 
 
-  private CustomEntity<?> getFromDB(CustomEntity<LibrosEntity> entity) {
+  private CustomEntity<?> getFromDB(CustomEntity<?> entity) throws UserNullinputException {
     int id = inputNumber("Id del " + entity.name() + " a actualizar");
     return this.utils.getFromDb(id, entity);
   }
@@ -90,8 +148,9 @@ public class LibraryManagement {
 //    return libro;
 //  }
 
-  private void menu() {
+  private void menu() throws UserNullinputException {
     String choice = inputData(this.MENUCHOICES);
+
 
     while(!isNumberValid(choice)){
       choice = inputData("Opción inválida, por favor, escoge una opción entre: " + this.MENUCHOICES);
@@ -102,7 +161,7 @@ public class LibraryManagement {
     this.handleMenuChoice(choiceInt);
   }
 
-  private void handleMenuChoice(int choice) {
+  private void handleMenuChoice(int choice) throws UserNullinputException {
     this.menuCallbackMap.get(choice).run();
     this.menu();
   }
@@ -111,7 +170,7 @@ public class LibraryManagement {
 
 
   // Returns to the menu in case of wrong input
-  private void returnToMenuAfterWrongInput() {
+  private void returnToMenuAfterWrongInput() throws UserNullinputException {
     showWrongChoiceMessage();
     menu();
   }

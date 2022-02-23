@@ -1,5 +1,7 @@
 package entity;
 
+import exception.UserNullinputException;
+
 import javax.persistence.Entity;
 
 /************************************************************************
@@ -12,8 +14,9 @@ import javax.persistence.Entity;
 
 public interface CustomEntity<T> extends Entity {
     void setId(int entityId);
+    int getId();
     String name();
-    CustomEntity<T> createWithJoption(CustomEntity<?> entity);
+    CustomEntity<T> createWithJoption(CustomEntity<?> entity) throws UserNullinputException;
 }
 
 

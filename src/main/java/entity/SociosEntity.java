@@ -1,9 +1,14 @@
 package entity;
 
 
+import exception.UserNullinputException;
+
 import java.lang.annotation.Annotation;
 import java.util.Objects;
 import javax.persistence.*;
+
+import static utils.ManagamentUtils.inputNumber;
+import static utils.ManagamentUtils.inputString;
 
 /************************************************************************
  Made by        PatrickSys
@@ -123,8 +128,24 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
   }
 
   @Override
-  public CustomEntity<SociosEntity> createWithJoption(CustomEntity<?> entity) {
-    return null;
+  public CustomEntity<SociosEntity> createWithJoption(CustomEntity<?> socio) throws UserNullinputException {
+
+    SociosEntity newSocio = new SociosEntity();
+    newSocio.setId(socio.getId());
+    String nombre = inputString("nombre del socio: ");
+    String apellidos = inputString("apellidos");
+    int edad = inputNumber("edad: ");
+    String direccion = inputString("direccion: ");
+    int telefono = inputNumber("telefono: ");
+
+
+    newSocio.setNombre(nombre);
+    newSocio.setApellidos(apellidos);
+    newSocio.setEdad(edad);
+    newSocio.setDireccion(direccion);
+    newSocio.setTelefono(telefono);
+
+    return newSocio;
   }
 
 
