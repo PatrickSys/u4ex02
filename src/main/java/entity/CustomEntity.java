@@ -17,6 +17,7 @@ public interface CustomEntity<T> extends Entity {
     int getId();
     String name();
     CustomEntity<T> createWithJoption(CustomEntity<?> entity) throws UserNullinputException;
+    String findBy();
 }
 
 

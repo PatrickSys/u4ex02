@@ -24,7 +24,7 @@ public class LibrosEntity implements CustomEntity<LibrosEntity> {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
   @Column(name = "id_libro", nullable = false)
-  private int idLibro;
+  private int id;
 
   @Basic
   @Column(name = "titulo", nullable = true, length = 50)
@@ -47,11 +47,11 @@ public class LibrosEntity implements CustomEntity<LibrosEntity> {
   private Integer anoEdicion;
 
   public int getId() {
-    return idLibro;
+    return id;
   }
 
   public void setId(int idLibro) {
-    this.idLibro = idLibro;
+    this.id = idLibro;
   }
 
   public String getTitulo() {
@@ -100,7 +100,7 @@ public class LibrosEntity implements CustomEntity<LibrosEntity> {
     if (o == null || getClass() != o.getClass()) return false;
     LibrosEntity that = (LibrosEntity) o;
     return (
-      idLibro == that.idLibro &&
+      id == that.id &&
       Objects.equals(titulo, that.titulo) &&
       Objects.equals(numEjemplares, that.numEjemplares) &&
       Objects.equals(editorial, that.editorial) &&
@@ -112,7 +112,7 @@ public class LibrosEntity implements CustomEntity<LibrosEntity> {
   @Override
   public int hashCode() {
     return Objects.hash(
-      idLibro,
+            id,
       titulo,
       numEjemplares,
       editorial,
@@ -149,4 +149,19 @@ public class LibrosEntity implements CustomEntity<LibrosEntity> {
     return newLibro;
   }
 
+  @Override
+  public String findBy() {
+    return null;
+  }
+
+  @Override
+  public String toString() {
+    return "Libro: " +
+            "id =" + id +
+            " titulo: " + titulo +
+            " num. Ejemplares: " + numEjemplares +
+            " editorial: " + editorial +
+            " num. Paginas: " + numPaginas +
+            " año Edicion: " + anoEdicion ;
+  }
 }

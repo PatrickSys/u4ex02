@@ -7,8 +7,7 @@ import java.lang.annotation.Annotation;
 import java.util.Objects;
 import javax.persistence.*;
 
-import static utils.ManagamentUtils.inputNumber;
-import static utils.ManagamentUtils.inputString;
+import static utils.ManagamentUtils.*;
 
 /************************************************************************
  Made by        PatrickSys
@@ -26,10 +25,10 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
   @Column(name = "id_socio", nullable = false)
-  private int idSocio;
+  private int id;
 
   @Basic
-  @Column(name = "nombre", nullable = false, length = 50)
+  @Column(name = "nombre", nullable = true, length = 50)
   private String nombre;
 
   @Basic
@@ -50,11 +49,11 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
 
 
   public int getId() {
-    return idSocio;
+    return id;
   }
 
   public void setId(int idSocio) {
-    this.idSocio = idSocio;
+    this.id = idSocio;
   }
 
   public String getNombre() {
@@ -103,7 +102,7 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
     if (o == null || getClass() != o.getClass()) return false;
     SociosEntity that = (SociosEntity) o;
     return (
-      idSocio == that.idSocio &&
+      id == that.id &&
       Objects.equals(nombre, that.nombre) &&
       Objects.equals(apellidos, that.apellidos) &&
       Objects.equals(edad, that.edad) &&
@@ -113,8 +112,19 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
   }
 
   @Override
+  public String toString() {
+    return "Socio: " +
+            "ID: " + id +
+            ", nombre: " + nombre +
+            ", apellidos: " + apellidos +
+            ", edad: " + edad +
+            ", direccion: " + direccion +
+            ", telefono: " + telefono;
+  }
+
+  @Override
   public int hashCode() {
-    return Objects.hash(idSocio, nombre, apellidos, edad, direccion, telefono);
+    return Objects.hash(id, nombre, apellidos, edad, direccion, telefono);
   }
 
   @Override
@@ -138,7 +148,6 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
     String direccion = inputString("direccion: ");
     int telefono = inputNumber("telefono: ");
 
-
     newSocio.setNombre(nombre);
     newSocio.setApellidos(apellidos);
     newSocio.setEdad(edad);
@@ -146,6 +155,11 @@ public class SociosEntity implements CustomEntity<SociosEntity> {
     newSocio.setTelefono(telefono);
 
     return newSocio;
+  }
+
+  @Override
+  public String findBy() {
+    return null;
   }
 
 

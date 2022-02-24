@@ -8,14 +8,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
 
-import static utils.ManagamentUtils.showEntityNotFoundException;
 import static utils.ManagamentUtils.showSuccessfullyEntityDeleted;
 
 /************************************************************************
@@ -38,7 +36,7 @@ public class HibernateUtil {
         this.initializeConfig();
     }
 
-    public void persist(Object object) {
+    public void persist(CustomEntity<?> object) {
 
         this.session = this.sessionFactory.openSession();
         this.session.beginTransaction();
@@ -78,7 +76,7 @@ public class HibernateUtil {
     }
 
 
-    public CustomEntity<?> getFromDb(int id, CustomEntity<?> entity) {
+    public CustomEntity<?> findById(int id, CustomEntity<?> entity) {
         this.session = this.sessionFactory.openSession();
         this.session.beginTransaction();
         CustomEntity<?> retrievedEntity = this.session.get(entity.getClass(), id);
@@ -88,6 +86,27 @@ public class HibernateUtil {
         if(null == retrievedEntity) {
             throw new EntityNotFoundException(entity.name());
         }
+        return retrievedEntity;
+    }
+
+    public CustomEntity<?> findByField(CustomEntity<?> entity, String field, String fieldValue) {
+        this.session = this.sessionFactory.openSession();
+        this.session.beginTransaction();
+        Query<?> query = this.session.createQuery("from " + entity.getClass().getName() + " e where e."+  field + "=:param ", entity.getClass());
+        if (fieldValue.matches("\\d+"))
+         {
+             int intValue = Integer.parseInt(fieldValue);
+             query.setParameter("param", intValue);
+         }
+
+         else {
+            query.setParameter("param", fieldValue);
+        }
+        System.out.println(query);
+        CustomEntity<?> retrievedEntity = (CustomEntity<?>) query.uniqueResult();
+        System.out.println(retrievedEntity);
+        this.session.flush();
+        this.session.close();
         return retrievedEntity;
     }
 

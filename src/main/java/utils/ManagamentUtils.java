@@ -87,4 +87,7 @@ public class ManagamentUtils {
     public static void showSuccessfullyEntityDeleted(String entityName) {
         JOptionPane.showMessageDialog(null,entityName + " borrado de la base de datos");
     }
+    public static String createForSearch(String field) throws UserNullinputException {
+        return inputData(field);
+    }
 }

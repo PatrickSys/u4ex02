@@ -1,9 +1,14 @@
 package entity;
 
+import exception.UserNullinputException;
+
 import java.lang.annotation.Annotation;
 import java.sql.Date;
 import java.util.Objects;
 import javax.persistence.*;
+
+import static utils.ManagamentUtils.inputNumber;
+import static utils.ManagamentUtils.inputString;
 
 /************************************************************************
  Made by        PatrickSys
@@ -113,9 +118,30 @@ public class PrestamosEntity implements CustomEntity<PrestamosEntity> {
     return "Prestamo";
   }
 
+
   @Override
-  public CustomEntity<PrestamosEntity> createWithJoption(CustomEntity<?> entity) {
+  public String findBy() {
     return null;
+  }
+
+
+  @Override
+  public CustomEntity<PrestamosEntity> createWithJoption(CustomEntity<?> prestamo) throws UserNullinputException {
+    PrestamosEntity newPrestamo = new PrestamosEntity();
+    newPrestamo.setId(prestamo.getId());
+
+    int idLibro = inputNumber("id del libro: ");
+    int idSocio = inputNumber("id del socio: ");
+    int numeroEjemplares = inputNumber("numero ejemplares: ");
+    String editorial = inputString("editorial: ");
+    int numPaginas = inputNumber("numero de páginas: ");
+    int anoEdicion = inputNumber("año de edición: ");
+    newPrestamo.setIdLibro(idLibro);
+    newPrestamo.setIdSocio(idSocio);
+//    newLibro.setEditorial(editorial);
+//    newLibro.setNumPaginas(numPaginas);
+//    newLibro.setAnoEdicion(anoEdicion);
+//    return newLibro;
   }
 
 

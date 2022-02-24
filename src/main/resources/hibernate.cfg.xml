@@ -23,6 +23,9 @@
     </property>
     <!-- DB schema will be updated if needed -->
     <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
+    <mapping class="entity.SociosEntity"/>
+    <mapping class="entity.LibrosEntity"/>
+    <mapping class="entity.PrestamosEntity"/>
 
   </session-factory>
 

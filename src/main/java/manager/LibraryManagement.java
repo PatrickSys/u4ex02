@@ -2,11 +2,12 @@ package manager;
 
 import entity.CustomEntity;
 import entity.LibrosEntity;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.OptimisticLockException;
+import javax.swing.*;
 
 import entity.SociosEntity;
 import exception.UserNullinputException;
@@ -28,7 +29,7 @@ public class LibraryManagement {
 
   final String MENUCHOICES =
     "Introduce una opción: \n 1.Dar de alta un libro\n 2.Dar de baja un libro\n 3.Modificar un libro\n " +
-    "4.Dar de alta un socio \n 5.Dar de baja un socio\n 6.Modificar un socio";
+    "4.Dar de alta un socio \n 5.Dar de baja un socio\n 6.Modificar un socio\n 7.Consultar un socio\n 8.Consultar un libro" ;
 
   Map<Integer, Runnable> menuCallbackMap;
   private String menuChoices;
@@ -44,12 +45,12 @@ public class LibraryManagement {
     // do things
     try {
       menu();
-    } catch (UserNullinputException e) {
+    } catch (UserNullinputException | ClassCastException e) {
       menu();
     }
   }
 
-  private void initializeMenuMap() throws UserNullinputException {
+  private void initializeMenuMap()  {
     this.menuCallbackMap = new HashMap<>();
     this.menuCallbackMap.put(1, () -> this.create(new LibrosEntity()));
     this.menuCallbackMap.put(2, () -> this.baja(new LibrosEntity()));
@@ -57,6 +58,8 @@ public class LibraryManagement {
     this.menuCallbackMap.put(4, () -> this.create(new SociosEntity()));
     this.menuCallbackMap.put(5, () -> this.baja(new SociosEntity()));
     this.menuCallbackMap.put(6, () -> this.update(new SociosEntity()));
+    this.menuCallbackMap.put(7, () -> this.consulta(new SociosEntity()));
+    this.menuCallbackMap.put(8, () -> this.consulta(new LibrosEntity()));
 
   }
 
@@ -71,40 +74,11 @@ public class LibraryManagement {
   }
 
 
-  private void updateLibro(LibrosEntity entity) {
-    try {
-      LibrosEntity retrievedEntity = (LibrosEntity) getFromDB(entity);
-      LibrosEntity newLibro = (LibrosEntity) entity.createWithJoption(retrievedEntity);
-      this.utils.update(newLibro);
-    }
-    catch (UserNullinputException e) {
-      e.printStackTrace();
-    }
-    catch (EntityNotFoundException e ) {
-      showEntityNotFoundException(e.getMessage());
-    }
-  }
-
   private void update(CustomEntity<?> entity) {
     try {
-      CustomEntity<?> retrievedEntity = getFromDB(entity);
+      CustomEntity<?> retrievedEntity = findById(entity);
       CustomEntity<?> newEntity =  entity.createWithJoption(retrievedEntity);
       this.utils.update(newEntity);
-    }
-    catch (UserNullinputException e) {
-      e.printStackTrace();
-    }
-    catch (EntityNotFoundException e ) {
-      showEntityNotFoundException(e.getMessage());
-    }
-  }
-
-
-  private void updateSocio(CustomEntity<?> socio) {
-    try {
-      CustomEntity<?> retrievedEntity =  getFromDB(socio);
-      CustomEntity<?> newLibro =  socio.createWithJoption(retrievedEntity);
-      this.utils.update(newLibro);
     }
     catch (UserNullinputException e) {
       e.printStackTrace();
@@ -136,17 +110,36 @@ public class LibraryManagement {
   }
 
 
-  private CustomEntity<?> getFromDB(CustomEntity<?> entity) throws UserNullinputException {
+  private CustomEntity<?> findById(CustomEntity<?> entity) throws UserNullinputException {
     int id = inputNumber("Id del " + entity.name() + " a actualizar");
-    return this.utils.getFromDb(id, entity);
+    return this.utils.findById(id, entity);
   }
 
-//  private LibrosEntity createLibroWithId() {
-//    LibrosEntity libro = createLibro();
-//    int id = inputNumber("id del libro a actualizar");
-//    libro.setId(id);
-//    return libro;
-//  }
+  private void consulta(CustomEntity<?> entity) {
+
+    String field = "";
+    String fieldValue = "";
+    try {
+      field = inputData("campo por el que buscar");
+      List<String> entityFields = Arrays.stream(entity.getClass().getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
+
+      if(!entityFields.contains(field)) {
+        throw new NoSuchFieldException("El campo no existe");
+      }
+
+      fieldValue = createForSearch(field);
+      CustomEntity<?> retrievedEntity = this.utils.findByField(entity, field, fieldValue);
+      if(null == retrievedEntity ) {
+        showEntityNotFoundException(entity.name());
+        return;
+      }
+      JOptionPane.showMessageDialog(null, retrievedEntity.toString());
+
+    } catch (NoSuchFieldException e) {
+      JOptionPane.showMessageDialog(null, e.getMessage());
+    } catch (UserNullinputException ignored) {
+    }
+  }
 
   private void menu() throws UserNullinputException {
     String choice = inputData(this.MENUCHOICES);
